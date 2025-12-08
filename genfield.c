@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include <time.h>
 
+int GetSize();
+int GetDif();
+void bombs(int*array, int amount, int dimention);
+uint8_t checkdouble(int *array, int amount);
+void generate(int* array);
 
 int GetSize()
 {
@@ -59,15 +64,42 @@ int GetDif()
 
 void bombs(int*array, int amount, int dimention)
 {
-    srand(time(NULL));
+    int *start = array;
+    uint8_t dupindex;
     for(int i = 0; i< amount; i++)
     {
-        *array = rand() % dimention; //generate bombs and check for doubles
+        *array = rand() % (dimention*dimention);
+        array +=1;
     }
+    dupindex = checkdouble(start,amount);
+    while(dupindex)
+    {
+        array = start;
+        *(array+dupindex-1) = rand() % (dimention*dimention);
+        dupindex = checkdouble(start,amount);
+    }
+
+}
+
+uint8_t checkdouble(int *array, int amount) // returns index of first element that has a double in the same array
+{
+    for(int i = 0; i<amount; i++ )
+    {
+        for(int j = i+1; j <amount; j++)
+        {
+            if(*(array+i) == *(array+j))
+            {
+                return i+1;
+            }
+        }
+    }
+    return 0;
 }
 
 void generate(int* array)
 {
+    int bombs[56];
     int size = GetSize();
     int dif = GetDif();
+
 }
