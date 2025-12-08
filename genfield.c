@@ -8,7 +8,8 @@ int GetSize();
 int GetDif();
 void bombs(int*array, int amount, int dimention);
 uint8_t checkdouble(int *array, int amount);
-void generate(int* array);
+void generate(int* array[15][15]);
+int checkbombs(int*array[15][15],int size);
 
 int GetSize()
 {
@@ -96,10 +97,63 @@ uint8_t checkdouble(int *array, int amount) // returns index of first element th
     return 0;
 }
 
-void generate(int* array)
+int checkbombs(int array[][15], int size, int RowIndex, int ColIndex)
 {
-    int bombs[56];
-    int size = GetSize();
-    int dif = GetDif();
+    int count = 0;
+    if(array[RowIndex][ColIndex] !=9)
+    {
+        for (int row = -1; row<=1; row++)
+        {
+            for(int col = -1; col<=1; col++)
+            {
+                if(row == 0 && col == 0)
+                {
+                    continue;
+                }
+                if(row + RowIndex >= 0 && row+RowIndex<size && col+ColIndex>= 0 && col+ColIndex< size)
+                {
+                    if(array[RowIndex+row][ColIndex+col] == 9)
+                    {
+                        count+=1;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+    else
+    {
+        return 9;
+    }
+        
+}
 
+void generate(int array[15][15])
+{
+    int amount;
+    int TSquares[8];
+    int row, column;
+    int sizes[] = {5,8,15};
+    int dificulty[] = {-1, 0, 1}; 
+    int bomb[56];
+    int size = GetSize();
+    size = sizes[size];
+    int dif = GetDif();
+    dif = dificulty[dif];
+    amount = (size*size)/4 + (dif*size/3);
+    bombs(*bomb, amount, size); //genereert bommen en aantal op basis van groote en moeilijkheid van spel
+    for(int i = 0; amount; i++) //assigns bombs to their respectiv spot in the field
+    {
+        row = bomb[i]/size;
+        column = bomb[i]%size;
+        array[row][column] = 9;
+    }
+    for(int i = 0; i<size; i++)
+    {
+        for(int j = 0; j<size; j++)
+        {
+            array[i][j] = checkbombs(array, size, i, j);
+        }
+    }
+    
 }
