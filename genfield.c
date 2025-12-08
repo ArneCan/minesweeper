@@ -8,59 +8,66 @@ int GetSize();
 int GetDif();
 void bombs(int*array, int amount, int dimention);
 uint8_t checkdouble(int *array, int amount);
-void generate(int* array[15][15]);
-int checkbombs(int*array[15][15],int size);
+void generate(int array[15][15]);
+int checkbombs(int array[][15], int size, int RowIndex, int ColIndex);
 
 int GetSize()
 {
     char options[3][5][7] = {{"SMALL", "small", "Small", "s", "S"},
                         {"MEDIUM", "Medium", "medium", "M", "m"},
                         {"LARGE", "Large", "large", "L", "l"}};
-    uint8_t found = 0;
+    int8_t found = -1;
     char selection[7];
     do
     {
         printf("select size, SMALL, MEDIUM, LARGE: ");
-        scanf("%s", selection);
+        scanf("%7s", selection);
         for(int i = 0; i<3; i++)
         {
             for(int j = 0; j<5; j++)
             {
                 if(strcmp(selection, options[i][j]) ==0)
                 {
-                    return i;
-                    found = 1;
+                    found = i;
                     break;
                 }
             }
+            if (found != -1)
+            {
+                break;
+            }
         }
-    } while (~found);
-    
+    } while (found == -1);
+    return found;    
 }
 int GetDif()
 {
     char options[3][3][7] = {{"EASY", "Easy", "easy"},
                         {"MEDIUM", "Medium", "medium"},
                         {"HARD", "Hard", "hard"}};
-    uint8_t found = 0;
+    int8_t found = -1;
     char selection[7];
     do
     {
         printf("select difficulty, EASY, MEDIUM, HARD: ");
-        scanf("%s", selection);
+        scanf("%7s", selection);
         for(int i = 0; i<3; i++)
         {
-            for(int j = 0; j<5; j++)
+            for(int j = 0; j<3; j++)
             {
                 if(strcmp(selection, options[i][j]) ==0)
                 {
-                    return i;
-                    found = 1;
+                    found = i;
                     break;
                 }
             }
+        if (found != -1)
+        {
+            break;
         }
-    } while (~found);
+        }
+    } while (found == -1);
+    return found;
 }
 
 void bombs(int*array, int amount, int dimention)
@@ -135,14 +142,14 @@ void generate(int array[15][15])
     int row, column;
     int sizes[] = {5,8,15};
     int dificulty[] = {-1, 0, 1}; 
-    int bomb[56];
+    int bomb[61];
     int size = GetSize();
     size = sizes[size];
     int dif = GetDif();
     dif = dificulty[dif];
-    amount = (size*size)/4 + (dif*size/3);
-    bombs(*bomb, amount, size); //genereert bommen en aantal op basis van groote en moeilijkheid van spel
-    for(int i = 0; amount; i++) //assigns bombs to their respectiv spot in the field
+    amount = ((size*size)/4) + (dif*size/3);
+    bombs(bomb, amount, size); //genereert bommen en aantal op basis van groote en moeilijkheid van spel
+    for(int i = 0; i<amount; i++) //assigns bombs to their respectiv spot in the field
     {
         row = bomb[i]/size;
         column = bomb[i]%size;
@@ -152,7 +159,10 @@ void generate(int array[15][15])
     {
         for(int j = 0; j<size; j++)
         {
-            array[i][j] = checkbombs(array, size, i, j);
+            if(array[i][j] != 9)
+            {
+                array[i][j] = checkbombs(array, size, i, j);
+            }
         }
     }
     
