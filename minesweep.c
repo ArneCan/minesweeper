@@ -9,8 +9,9 @@ void innit(uint8_t array[15][15]);
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
 
 
-int main()
+/*int main()
 {
+    enum state {CONFIG, REVEAL, FLAG, END};
     uint8_t size, dif;
     srand(time(NULL));
     uint8_t array[15][15];
@@ -22,6 +23,39 @@ int main()
     showarr(array, size);
     showfield(array, size);
     getch();
+}*/
+
+int main(void)
+{
+    enum states {CONFIG, REVEAL, FLAG, END};
+    typedef enum states state;
+    state gamestate = CONFIG;
+    uint8_t size, dif;
+    char correct;
+    uint8_t array[15][15];
+
+    srand(time(NULL));
+
+    do {
+        size = GetSize();
+        dif = GetDif();
+        innit(array);
+        printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
+        scanf(" %c", &correct);
+        if (correct == 'y')
+        {
+            gamestate = REVEAL;
+        }
+    } while (gamestate == CONFIG);
+    showfield(array, size);
+    firstmove(array, size, dif);
+    while (gamestate == REVEAL || gamestate == FLAG)
+    {
+        showfield(array, size);
+        getch();
+    }
+
+    return 0;
 }
 
 void innit(uint8_t array[15][15])

@@ -1,10 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void showfield(uint8_t array[15][15], uint8_t size);
+void showfield(uint8_t array[15][15], uint8_t size); //speelveld voor user
 void showarr(uint8_t array[15][15], uint8_t size); //for debugging
-uint8_t showsquare(uint8_t array[15][15]);
-uint8_t flagsquare(uint8_t array[15][15]);
+uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t state, uint8_t r, uint8_t c); //laat veld zien of plaatst vlag
 
 void showfield(uint8_t array[15][15], uint8_t size)
 {
@@ -104,14 +103,18 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t state, uint8_t r
         printf("vul coördinaat in (rij colom)");
         scanf("%hhu %hhu", &r, &c);
     }
-    if(state == 0)
+    if(state == 1)
     {
         array[r][c] -= 10;
         return array[r][c];
     }
-    else
+    else if (state == 2)
     {
         array[r][c] = 20;
         return 0;
+    }
+    else
+    {
+        printf("something went wrong");
     }
 }
