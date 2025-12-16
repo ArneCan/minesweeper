@@ -89,16 +89,17 @@ void showarr(uint8_t array[15][15], uint8_t size)
 
 uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t state, uint8_t r, uint8_t c)
 {
-    printf("vul coördinaat in (rij colom)");
-    scanf("%hhu %hhu", &r, &c);
     while (array[r][c] -10 < 0 || array[r][c] == 20)
     {
         printf("al zichtbaar \n");
         printf("vul coördinaat in (rij colom)");
         scanf("%hhu %hhu", &r, &c);
     }
-    while (r <= size || c <= size)
+    while (r >= size || c >= size)
     {
+        printf("r: %d\n", (uint8_t)r);
+        printf("c: %d\n", (uint8_t)c);
+        printf("size: %d \n", size);
         printf("out of bounds \n");
         printf("vul coördinaat in (rij colom)");
         scanf("%hhu %hhu", &r, &c);

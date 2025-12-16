@@ -4,9 +4,13 @@
 #include <conio.h>
 #include "gamelogic.c"
 
+enum states {CONFIG, REVEAL, FLAG, END};
+typedef enum states state;
 
 void innit(uint8_t array[15][15]);
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
+uint8_t checkswap(state *gamestate, uint8_t input);
+
 
 
 /*int main()
@@ -27,10 +31,8 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
 
 int main(void)
 {
-    enum states {CONFIG, REVEAL, FLAG, END};
-    typedef enum states state;
     state gamestate = CONFIG;
-    uint8_t size, dif;
+    uint8_t size, dif, r, c, swapped;
     char correct;
     uint8_t array[15][15];
 
@@ -51,8 +53,27 @@ int main(void)
     firstmove(array, size, dif);
     while (gamestate == REVEAL || gamestate == FLAG)
     {
+        swapped = 0;
+        system("cls");
         showfield(array, size);
-        getch();
+
+        printf("vul rij en kolom in met spatie in (15 om te vlag te toggelen)");
+        scanf("%hhu", &r);
+        swapped = checkswap(&gamestate, r);
+        if (swapped)
+        {
+            continue;
+        }
+
+        printf("vul colom in (15 om te vlag te toggelen)");
+        scanf("%hhu", &c);
+        swapped = checkswap(&gamestate, c);
+        if (swapped)
+        {
+            continue;
+        }
+
+        editsquare(array, size, gamestate, (uint8_t)r, (uint8_t)c);
     }
 
     return 0;
@@ -100,4 +121,21 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif)
         array[r][c+1] -= 10;
     }
     
+}
+
+uint8_t checkswap(state *gamestate, uint8_t input)
+{
+    if (input == 15)
+    {
+        if (*gamestate == FLAG)
+        {
+            *gamestate = REVEAL;
+        }
+        else
+        {
+            *gamestate = FLAG;
+        }
+        return 1;
+    }
+    return 0;
 }
