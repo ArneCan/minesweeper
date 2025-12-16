@@ -115,7 +115,7 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size)
             continue;
         }
         system("cls");
-    } while (array[r][c] -10 < 0 || array[r][c] > 19 || r >= size || c >= size);
+    } while (array[r][c] -10 < 0 || array[r][c] > 29 || r >= size || c >= size);
 
     if(gamestate == REVEAL)
     {
