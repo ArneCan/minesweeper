@@ -4,15 +4,16 @@
 #include <stdint.h>
 #include <time.h>
 
-int GetSize();
-int GetDif();
+uint8_t GetSize();
+uint8_t GetDif();
 void bombs(int*array, int amount, int dimention);
 uint8_t checkdouble(int *array, int amount);
-void generate(int array[15][15]);
-int checkbombs(int array[][15], int size, int RowIndex, int ColIndex);
+void generate(uint8_t array[15][15], uint8_t size, uint8_t dif);
+uint8_t checkbombs(uint8_t array[][15], uint8_t size, int RowIndex, int ColIndex);
 
-int GetSize()
+uint8_t GetSize()
 {
+    int sizes[] = {5,8,15};
     char options[3][5][7] = {{"SMALL", "small", "Small", "s", "S"},
                         {"MEDIUM", "Medium", "medium", "M", "m"},
                         {"LARGE", "Large", "large", "L", "l"}};
@@ -22,7 +23,7 @@ int GetSize()
     {
         printf("select size, SMALL, MEDIUM, LARGE: ");
         scanf("%7s", selection);
-        for(int i = 0; i<3; i++)
+        for(uint8_t i = 0; i<3; i++)
         {
             for(int j = 0; j<5; j++)
             {
@@ -38,9 +39,9 @@ int GetSize()
             }
         }
     } while (found == -1);
-    return found;    
+    return sizes[found];    
 }
-int GetDif()
+uint8_t GetDif()
 {
     char options[3][3][7] = {{"EASY", "Easy", "easy"},
                         {"MEDIUM", "Medium", "medium"},
@@ -104,10 +105,10 @@ uint8_t checkdouble(int *array, int amount) // returns index of first element th
     return 0;
 }
 
-int checkbombs(int array[][15], int size, int RowIndex, int ColIndex)
+uint8_t checkbombs(uint8_t array[][15], uint8_t size, int RowIndex, int ColIndex)
 {
-    int count = 0;
-    if(array[RowIndex][ColIndex] !=9)
+    uint8_t count = 0;
+    if(array[RowIndex][ColIndex] !=9 && array[RowIndex][ColIndex] !=19)
     {
         for (int row = -1; row<=1; row++)
         {
@@ -119,34 +120,30 @@ int checkbombs(int array[][15], int size, int RowIndex, int ColIndex)
                 }
                 if(row + RowIndex >= 0 && row+RowIndex<size && col+ColIndex>= 0 && col+ColIndex< size)
                 {
-                    if(array[RowIndex+row][ColIndex+col] == 9)
+                    if(array[RowIndex+row][ColIndex+col] == 9 || array[RowIndex+row][ColIndex+col] == 19)
                     {
                         count+=1;
                     }
                 }
             }
         }
-        return count;
+        return count+10;
     }
     else
     {
-        return 9;
+        return 19;
     }
         
 }
 
-void generate(int array[15][15])
+void generate(uint8_t array[15][15], uint8_t size, uint8_t selecdif)
 {
-    int amount;
+    int amount, dif;
     int TSquares[8];
     int row, column;
-    int sizes[] = {5,8,15};
     int dificulty[] = {-1, 0, 1}; 
     int bomb[61];
-    int size = GetSize();
-    size = sizes[size];
-    int dif = GetDif();
-    dif = dificulty[dif];
+    dif = dificulty[selecdif];
     amount = ((size*size)/4) + (dif*size/3);
     bombs(bomb, amount, size); //genereert bommen en aantal op basis van groote en moeilijkheid van spel
     for(int i = 0; i<amount; i++) //assigns bombs to their respectiv spot in the field
@@ -159,10 +156,7 @@ void generate(int array[15][15])
     {
         for(int j = 0; j<size; j++)
         {
-            if(array[i][j] != 9)
-            {
-                array[i][j] = checkbombs(array, size, i, j);
-            }
+            array[i][j] = checkbombs(array, size, i, j);
         }
     }
     
