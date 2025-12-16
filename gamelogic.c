@@ -97,7 +97,7 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size)
 {
     printf("gamestate: %d", gamestate);
     uint8_t swapped, r, c;
-    do
+    do //check out of bounds en of vakje al vlag is of al gerevealed is
     {
         printf("vul rij en kolom in met spatie in (15 om te vlag te toggelen)");
         scanf("%hhu", &r);
@@ -114,7 +114,8 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size)
         {
             continue;
         }
-    } while (array[r][c] -10 < 0 || array[r][c] == 20 || r >= size || c >= size);
+        system("cls");
+    } while (array[r][c] -10 < 0 || array[r][c] > 19 || r >= size || c >= size);
 
     if(gamestate == REVEAL)
     {

@@ -4,7 +4,7 @@
 #include "gamelogic.c"
 #include <conio.h>
 
-void innit(uint8_t array[15][15]);
+void innit(uint8_t array[15][15], uint8_t size);
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
 
 
@@ -40,13 +40,7 @@ int main(void)
         do {
             size = GetSize();
             dif = GetDif();
-            innit(array);
-            printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
-            scanf(" %c", &correct);
-            if (correct == 'y')
-            {
-                gamestate = REVEAL;
-            }
+            innit(array, size);
         } while (gamestate == CONFIG);
 
         showfield(array, size);
@@ -57,7 +51,7 @@ int main(void)
             swapped = 0;
             system("cls");
             showfield(array, size);
-            
+
             result = editsquare(array, size);
             if (result == 9)
             {
@@ -91,13 +85,23 @@ int main(void)
     return 0;
 }
 
-void innit(uint8_t array[15][15])
+void innit(uint8_t array[15][15], uint8_t size)
 {
-    for(int i = 0; i<15; i++)
+    char correct;
+    for(int i = 0; i<size; i++)
     {
-        for(int j = 0; j< 15; j++)
+        for(int j = 0; j< size; j++)
         {
             array[i][j] = 10;
+        }
+    }
+    if(gamestate == CONFIG)
+    {
+        printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
+        scanf(" %c", &correct);
+        if (correct == 'y')
+        {
+            gamestate = REVEAL;
         }
     }
 }
@@ -112,7 +116,7 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif)
     } while (r < 0 || r >= size || c < 0 || c >= size );
     do
     {
-        innit(array);
+        innit(array, size);
         generate(array, size, dif);
     } while (array[r][c] == 19 || (array[r][c-1] == 19 && c-1 >= 0) || (array[r-1][c] == 19 && r-1 >= 0) || (array[r+1][c] == 19 && r+1 <size) || (array[r][c+1] == 19 && c+1 < size));
     array[r][c] -= 10;
