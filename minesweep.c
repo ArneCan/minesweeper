@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "genfield.c"
-#include <conio.h>
 #include "gamelogic.c"
-
-enum states {CONFIG, REVEAL, FLAG, END};
-typedef enum states state;
+#include <conio.h>
 
 void innit(uint8_t array[15][15]);
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
-uint8_t checkswap(state *gamestate, uint8_t input);
+
 
 
 
@@ -31,49 +28,64 @@ uint8_t checkswap(state *gamestate, uint8_t input);
 
 int main(void)
 {
-    state gamestate = CONFIG;
-    uint8_t size, dif, r, c, swapped;
-    char correct;
-    uint8_t array[15][15];
-
-    srand(time(NULL));
-
-    do {
-        size = GetSize();
-        dif = GetDif();
-        innit(array);
-        printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
-        scanf(" %c", &correct);
-        if (correct == 'y')
-        {
-            gamestate = REVEAL;
-        }
-    } while (gamestate == CONFIG);
-    showfield(array, size);
-    firstmove(array, size, dif);
-    while (gamestate == REVEAL || gamestate == FLAG)
+    uint8_t running = 1;
+    while(running)
     {
-        swapped = 0;
-        system("cls");
+        uint8_t size, dif, r, c, swapped, result;
+        char correct, restart;
+        uint8_t array[15][15];
+
+        srand(time(NULL));
+
+        do {
+            size = GetSize();
+            dif = GetDif();
+            innit(array);
+            printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
+            scanf(" %c", &correct);
+            if (correct == 'y')
+            {
+                gamestate = REVEAL;
+            }
+        } while (gamestate == CONFIG);
+
         showfield(array, size);
+        firstmove(array, size, dif);
 
-        printf("vul rij en kolom in met spatie in (15 om te vlag te toggelen)");
-        scanf("%hhu", &r);
-        swapped = checkswap(&gamestate, r);
-        if (swapped)
+        while (gamestate == REVEAL || gamestate == FLAG)
         {
-            continue;
-        }
+            swapped = 0;
+            system("cls");
+            showfield(array, size);
+            
+            result = editsquare(array, size);
+            if (result == 9)
+            {
+                gamestate = LOST;
+            }
 
-        printf("vul colom in (15 om te vlag te toggelen)");
-        scanf("%hhu", &c);
-        swapped = checkswap(&gamestate, c);
-        if (swapped)
+        if (gamestate == LOST)
         {
-            continue;
+            system("cls");
+            printf("BOEM: je bent verloren druk r om opnieuw te beginnen of s om te stoppen: ");
+            scanf(" %c", &restart);
+            while (restart != 'r' && restart != 's')
+            {
+                printf("ongeldige input s = stop, r = restart: ");
+                scanf(" %c", &restart);
+            }
+            if (restart == 'r')
+            {
+                gamestate = CONFIG;
+            }
+            else
+            {
+                running = 0;
+            }
+            
         }
-
-        editsquare(array, size, gamestate, (uint8_t)r, (uint8_t)c);
+    }
+    
     }
 
     return 0;
@@ -123,19 +135,3 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif)
     
 }
 
-uint8_t checkswap(state *gamestate, uint8_t input)
-{
-    if (input == 15)
-    {
-        if (*gamestate == FLAG)
-        {
-            *gamestate = REVEAL;
-        }
-        else
-        {
-            *gamestate = FLAG;
-        }
-        return 1;
-    }
-    return 0;
-}
