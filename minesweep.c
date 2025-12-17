@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "genfield.c"
 #include "gamelogic.c"
@@ -29,6 +30,7 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
 int main(void)
 {
     uint8_t running = 1;
+    uint8_t moves, bommen = 0;
     while(running)
     {
         uint8_t size, dif, r, c, swapped, result;
@@ -45,14 +47,17 @@ int main(void)
 
         showfield(array, size);
         firstmove(array, size, dif);
+        bommen = countbombs(array, size);
+        moves = (size*size)-bommen;
 
         while (gamestate == REVEAL || gamestate == FLAG)
         {
             swapped = 0;
             system("cls");
+            printf("moves: %d\n", moves);
             showfield(array, size);
 
-            result = editsquare(array, size);
+            result = editsquare(array, size, &moves);
             if (result == 9)
             {
                 gamestate = LOST;
@@ -61,6 +66,7 @@ int main(void)
         if (gamestate == LOST)
         {
             system("cls");
+            fflush(stdin);
             printf("BOEM: je bent verloren druk r om opnieuw te beginnen of s om te stoppen: ");
             scanf(" %c", &restart);
             while (restart != 'r' && restart != 's')
@@ -77,6 +83,24 @@ int main(void)
                 running = 0;
             }
             
+        }
+        else if (gamestate == WON)
+        {
+            printf("proficiat, je bent gewonnen. Druk r om opnieuw te beginnen of s om te stoppen: ");
+            scanf(" %c", &restart);
+            while (restart != 'r' && restart != 's')
+            {
+                printf("ongeldige input s = stop, r = restart: ");
+                scanf(" %c", &restart);
+            }
+            if (restart == 'r')
+            {
+                gamestate = CONFIG;
+            }
+            else
+            {
+                running = 0;
+            }
         }
     }
     

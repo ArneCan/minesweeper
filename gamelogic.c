@@ -7,8 +7,8 @@ state gamestate = CONFIG;
 
 void showfield(uint8_t array[15][15], uint8_t size); //speelveld voor user
 void showarr(uint8_t array[15][15], uint8_t size); //for debugging
-uint8_t editsquare(uint8_t array[15][15], uint8_t size); //laat veld zien of plaatst vlag
-uint8_t checkwin(uint8_t array[15][15], uint8_t size);
+uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move); //laat veld zien of plaatst vlag
+uint8_t countbombs(uint8_t array[15][15], uint8_t size);
 uint8_t checkswap(state *gamestate, uint8_t input);
 
 void showfield(uint8_t array[15][15], uint8_t size)
@@ -93,9 +93,8 @@ void showarr(uint8_t array[15][15], uint8_t size)
     }
 }
 
-uint8_t editsquare(uint8_t array[15][15], uint8_t size)
+uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move)
 {
-    printf("gamestate: %d", gamestate);
     uint8_t swapped, r, c;
     do //check out of bounds en of vakje al vlag is of al gerevealed is
     {
@@ -128,6 +127,11 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size)
         else
         {
             array[r][c] -= 10;
+            *move-=1;
+            if (*move == 0)
+            {
+                gamestate = WON;
+            }
             return array[r][c];
         }
     }
@@ -150,22 +154,24 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size)
     else
     {
         printf("something went wrong");
+        return 0;
     }
 }
 
-uint8_t checkwin(uint8_t array[15][15], uint8_t size)
+uint8_t countbombs(uint8_t array[15][15], uint8_t size)
 {
+    uint8_t count = 0;
     for(uint8_t i = 0; i< size; i++)
     {
         for(uint8_t j = 0; j<size; j++)
         {
-            if (array[i][j] >9 && array[i][j] != 20 && array[i][j] <20)
+            if (array[i][j] ==9 || array[i][j] == 19)
             {
-                return 0;
+                count += 1;
             }
         }
     }
-    return 1;
+    return count;
 }
 
 uint8_t checkswap(state *gamestate, uint8_t input)
