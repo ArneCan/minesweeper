@@ -9,7 +9,8 @@ void showfield(uint8_t array[15][15], uint8_t size); //speelveld voor user
 void showarr(uint8_t array[15][15], uint8_t size); //for debugging
 uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7]); //laat veld zien of plaatst vlag
 void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7]);
-uint8_t checkswap(state *gamestate, uint8_t input);
+uint8_t checkswap(state *gamestate, uint8_t input, char modus[7]);
+void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c);
 
 void showfield(uint8_t array[15][15], uint8_t size)
 {
@@ -62,7 +63,14 @@ void showfield(uint8_t array[15][15], uint8_t size)
                 
                 else
                 {
-                    printf("%u  ", array[i-1][j-1]);
+                    if(array[i-1][j-1] == 0)
+                    {
+                        printf("   ");
+                    }
+                    else
+                    {
+                        printf("%u  ", array[i-1][j-1]);
+                    }
                 }
             }
             else
@@ -113,7 +121,7 @@ uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char mo
         }
         else
         {
-            array[r][c] -= 10;
+            reveal(array, size, r, c);
             *move-=1;
             if (*move == 0)
             {
@@ -144,16 +152,18 @@ uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char mo
     }
 }
 
-uint8_t checkswap(state *gamestate, uint8_t input)
+uint8_t checkswap(state *gamestate, uint8_t input, char modus[7])
 {
     if (input == 15)
     {
         if (*gamestate == FLAG)
         {
+            strcpy(modus, "onthul");;
             *gamestate = REVEAL;
         }
         else
         {
+            strcpy(modus, "vlag");
             *gamestate = FLAG;
         }
         return 1;
@@ -163,9 +173,9 @@ uint8_t checkswap(state *gamestate, uint8_t input)
 
 void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
 {
-    printf("mode: %s\n vul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus);
+    printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus);
         scanf("%hhu", r);
-        *s = checkswap(&gamestate, *r);
+        *s = checkswap(&gamestate, *r, modus);
         if (*s)
         {
             return;
@@ -173,9 +183,35 @@ void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
 
         printf("vul colom in (15 om te vlag te toggelen)");
         scanf("%hhu", c);
-        *s = checkswap(&gamestate, *c);
+        *s = checkswap(&gamestate, *c, modus);
         if (*s)
         {
             return;
         }
+}
+
+void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c)
+{
+    array[r][c] -= 10;
+    if (array[r][c] == 0)
+    {
+        for(int8_t i = -1; i<2; i++)
+        {
+            for(int8_t j = -1; j<2; j++)
+            {
+                if(r+i >= size || r+i < 0 || c+j >= size || c+j < 0)
+                {
+                    continue;
+                }
+                if (j == 0 && i == 0)
+                {
+                    continue;
+                }
+                if(array[r+i][c+j] <20 && array[r+i][c+j] > 9)
+                {
+                    reveal(array, size, r+i, c+j); 
+                }
+            }
+        }
+    }
 }

@@ -117,15 +117,7 @@ void innit(uint8_t array[15][15], uint8_t size)
             array[i][j] = 10;
         }
     }
-    if(gamestate == CONFIG)
-    {
-        printf("ben je zeker dat je deze instellingen wilt behouden? (y/n)");
-        scanf(" %c", &correct);
-        if (correct == 'y')
-        {
-            gamestate = REVEAL;
-        }
-    }
+    gamestate = REVEAL;
 }
 
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* bommen)
@@ -140,24 +132,8 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* bommen
     {
         innit(array, size);
         *bommen = generate(array, size, dif);
-    } while (array[r][c] == 19 || (array[r][c-1] == 19 && c-1 >= 0) || (array[r-1][c] == 19 && r-1 >= 0) || (array[r+1][c] == 19 && r+1 <size) || (array[r][c+1] == 19 && c+1 < size));
-    array[r][c] -= 10;
-    if (r-1 >= 0)
-    {
-        array[r-1][c] -= 10;
-    }
-    if (c-1 >= 0)
-    {
-        array[r][c-1] -= 10;
-    }
-    if (r+1 < size)
-    {
-        array[r+1][c] -= 10;
-    }
-    if (c+1 < size)
-    {
-        array[r][c+1] -= 10;
-    }
+    } while (array[r][c] != 10 );
+    reveal(array, size, r, c);
     
 }
 
