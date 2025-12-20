@@ -7,8 +7,8 @@ state gamestate = CONFIG;
 
 void showfield(uint8_t array[15][15], uint8_t size); //speelveld voor user
 void showarr(uint8_t array[15][15], uint8_t size); //for debugging
-uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move); //laat veld zien of plaatst vlag
-uint8_t countbombs(uint8_t array[15][15], uint8_t size);
+uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7]); //laat veld zien of plaatst vlag
+void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7]);
 uint8_t checkswap(state *gamestate, uint8_t input);
 
 void showfield(uint8_t array[15][15], uint8_t size)
@@ -93,32 +93,19 @@ void showarr(uint8_t array[15][15], uint8_t size)
     }
 }
 
-uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move)
+uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7])
 {
     uint8_t swapped, r, c;
     do //check out of bounds en of vakje al vlag is of al gerevealed is
     {
-        printf("vul rij en kolom in met spatie in (15 om te vlag te toggelen)");
-        scanf("%hhu", &r);
-        swapped = checkswap(&gamestate, r);
-        if (swapped)
-        {
-            continue;
-        }
-
-        printf("vul colom in (15 om te vlag te toggelen)");
-        scanf("%hhu", &c);
-        swapped = checkswap(&gamestate, c);
-        if (swapped)
-        {
-            continue;
-        }
+        showfield(array, size);
+        getcords(&swapped, &r, &c, modus);
         system("cls");
     } while (array[r][c] -10 < 0 || array[r][c] > 29 || r >= size || c >= size);
 
+
     if(gamestate == REVEAL)
     {
-        printf("revealing");
         if (array[r][c] > 19)
         {
             printf("hier staat al een vlag");
@@ -138,7 +125,6 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move)
 
     else if (gamestate == FLAG)
     {
-        printf("flagging");
         if (array[r][c] > 19)
         {
             array[r][c] -= 10;
@@ -158,22 +144,6 @@ uint8_t editsquare(uint8_t array[15][15], uint8_t size, uint8_t* move)
     }
 }
 
-uint8_t countbombs(uint8_t array[15][15], uint8_t size)
-{
-    uint8_t count = 0;
-    for(uint8_t i = 0; i< size; i++)
-    {
-        for(uint8_t j = 0; j<size; j++)
-        {
-            if (array[i][j] ==9 || array[i][j] == 19)
-            {
-                count += 1;
-            }
-        }
-    }
-    return count;
-}
-
 uint8_t checkswap(state *gamestate, uint8_t input)
 {
     if (input == 15)
@@ -186,8 +156,26 @@ uint8_t checkswap(state *gamestate, uint8_t input)
         {
             *gamestate = FLAG;
         }
-        printf("gamestate %d", *gamestate);
         return 1;
     }
     return 0;
+}
+
+void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
+{
+    printf("mode: %s\n vul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus);
+        scanf("%hhu", r);
+        *s = checkswap(&gamestate, *r);
+        if (*s)
+        {
+            return;
+        }
+
+        printf("vul colom in (15 om te vlag te toggelen)");
+        scanf("%hhu", c);
+        *s = checkswap(&gamestate, *c);
+        if (*s)
+        {
+            return;
+        }
 }

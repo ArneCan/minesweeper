@@ -8,7 +8,7 @@ uint8_t GetSize();
 uint8_t GetDif();
 void bombs(int*array, int amount, int dimention);
 uint8_t checkdouble(int *array, int amount);
-void generate(uint8_t array[15][15], uint8_t size, uint8_t dif);
+uint8_t generate(uint8_t array[15][15], uint8_t size, uint8_t dif);
 uint8_t checkbombs(uint8_t array[][15], uint8_t size, int RowIndex, int ColIndex);
 
 uint8_t GetSize()
@@ -136,7 +136,7 @@ uint8_t checkbombs(uint8_t array[][15], uint8_t size, int RowIndex, int ColIndex
         
 }
 
-void generate(uint8_t array[15][15], uint8_t size, uint8_t selecdif)
+uint8_t generate(uint8_t array[15][15], uint8_t size, uint8_t selecdif)
 {
     int amount, dif;
     int TSquares[8];
@@ -159,5 +159,5 @@ void generate(uint8_t array[15][15], uint8_t size, uint8_t selecdif)
             array[i][j] = checkbombs(array, size, i, j);
         }
     }
-    
+    return amount;
 }

@@ -6,7 +6,7 @@
 #include <conio.h>
 
 void innit(uint8_t array[15][15], uint8_t size);
-void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
+void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* bommen);
 
 
 
@@ -30,9 +30,10 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif);
 int main(void)
 {
     uint8_t running = 1;
-    uint8_t moves, bommen = 0;
+    uint8_t moves, bommen;
+    char modus[7] = "onthul";
     while(running)
-    {
+    {                                               //begin game setup
         uint8_t size, dif, r, c, swapped, result;
         char correct, restart;
         uint8_t array[15][15];
@@ -43,21 +44,18 @@ int main(void)
             size = GetSize();
             dif = GetDif();
             innit(array, size);
-        } while (gamestate == CONFIG);
-
-        showfield(array, size);
-        firstmove(array, size, dif);
-        bommen = countbombs(array, size);
-        moves = (size*size)-bommen;
-
+        } while (gamestate == CONFIG);                  //end game setup
+            
+        showfield(array, size);                         //begin eerste move
+        firstmove(array, size, dif, &bommen);
+        moves = (size*size)-bommen-5;
+                                                        // eind eerste move
         while (gamestate == REVEAL || gamestate == FLAG)
         {
             swapped = 0;
-            system("cls");
-            printf("moves: %d\n", moves);
-            showfield(array, size);
+            //system("cls");
 
-            result = editsquare(array, size, &moves);
+            result = playeraction(array, size, &moves, modus); //returned getal onder geselecteerde square of 0 bij een vlag
             if (result == 9)
             {
                 gamestate = LOST;
@@ -130,7 +128,7 @@ void innit(uint8_t array[15][15], uint8_t size)
     }
 }
 
-void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif)
+void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* bommen)
 {
     uint8_t r,c;
     do
@@ -141,7 +139,7 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif)
     do
     {
         innit(array, size);
-        generate(array, size, dif);
+        *bommen = generate(array, size, dif);
     } while (array[r][c] == 19 || (array[r][c-1] == 19 && c-1 >= 0) || (array[r-1][c] == 19 && r-1 >= 0) || (array[r+1][c] == 19 && r+1 <size) || (array[r][c+1] == 19 && c+1 < size));
     array[r][c] -= 10;
     if (r-1 >= 0)
