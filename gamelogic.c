@@ -5,99 +5,77 @@ enum states {CONFIG, REVEAL, FLAG, WON, LOST};
 typedef enum states state;
 state gamestate = CONFIG;
 
-void showfield(uint8_t array[15][15], uint8_t size); //speelveld voor user
-void showarr(uint8_t array[15][15], uint8_t size); //for debugging
-uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7]); //laat veld zien of plaatst vlag
-void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7]);
-uint8_t checkswap(state *gamestate, uint8_t input, char modus[7]);
-void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c);
+void showfield(uint8_t array[15][15], uint8_t size, uint8_t* move); //speelveld laten zien met coordinaten
+uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7]); //verwerkt speler inputs
+void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7]); //input dialoog
+uint8_t checkswap(state *gamestate, uint8_t input, char modus[7]); //wisselen tussen vlag en onthul
+void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c, uint8_t* move); //vakje zichtbaar maken
+void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* totmoves); //eerste move is altijd 0
+void innit(uint8_t array[15][15], uint8_t size); //innitialisatie van het veld
 
-void showfield(uint8_t array[15][15], uint8_t size)
+void showfield(uint8_t array[15][15], uint8_t size, uint8_t* move)
 {
-    for (uint8_t i = 0; i<=size; i++)
+    for (uint8_t i = 0; i<=size; i++)//geneste for loop om over array te loopen
     {
         for(uint8_t j = 0; j<=size; j++)
         {
-            if(i == 0 && j == 0)
+            if(i == 0 && j == 0)// eerste vakje skippen (geen coordinaat hier)
             {
                 printf("   ");
                 continue;
             }
-            else if (i == 0)
+            else if (i == 0) // coordinaten op eerste rij printen
             {
-                if (j<= 10)
+                if (j<= 10) //juiste ofset bij 2 diget getallen
                 {
-                    printf("%d  ", j-1);
+                    printf("\033[92m%d  \033[0m", j-1); //coordinaten groen maken
                     continue;
                 }
                 else
                 {
-                    printf("%d ", j-1);
+                    printf("\033[92m%d \033[0m", j-1); //groen maken
                     continue;
                 }
             }
-            else if (j == 0)
+            else if (j == 0) // coordinaten op eerste collom printen
             {
                 if (i <= 10)
                 {
-                    printf(" %d ", i-1);
+                    printf("\033[92m %d \033[0m", i-1);
                     continue;
                 }
                 else
                 {
-                    printf("%d ", i-1);
+                    printf("\033[92m%d \033[0m", i-1);
                     continue;
                 }
                 
             }
-            else if (i >0 && j>0)
+            else //rest van de array printen
             {
-                if (array[i-1][j-1] > 9 && array[i-1][j-1] < 20)
+                if (array[i-1][j-1] > 9 && array[i-1][j-1] < 20) // blok printen indien niet zichtbaar
                 {
                     printf("%c  ", 219);
                 }
-                else if (array[i-1][j-1] > 19)
+                else if (array[i-1][j-1] > 19) //rode F printen wanneer het een vlag is
                 {
-                    printf("F  ");
+                    printf("\033[31mF  \033[0m");
                 }
                 
-                else
+                else // getal printen
                 {
-                    if(array[i-1][j-1] == 0)
+                    if(array[i-1][j-1] == 0) //spatie voor 0 om veld minder druk te maken
                     {
                         printf("   ");
                     }
-                    else
+                    else //getal printen
                     {
                         printf("%u  ", array[i-1][j-1]);
                     }
                 }
             }
-            else
-            {
-                printf("error");
-            }
         }
-        printf("\n");
-    }
-}
-
-void showarr(uint8_t array[15][15], uint8_t size)
-{
-    for(int i = 0; i<size;i++)
-    {
-        for(int j = 0; j<size; j++)
-        {
-            if(array[i][j]>9)
-            {
-                printf("%hhu ", array[i][j]);
-            }
-            else
-            {
-                printf("%hhu  ", array[i][j]);
-            }
-        }
-        printf("\n");
+        printf("\n"); // volgende rij printen
     }
 }
 
@@ -106,59 +84,48 @@ uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char mo
     uint8_t swapped, r, c;
     do //check out of bounds en of vakje al vlag is of al gerevealed is
     {
-        showfield(array, size);
+        showfield(array, size, move);
         getcords(&swapped, &r, &c, modus);
         system("cls");
     } while (array[r][c] -10 < 0 || array[r][c] > 29 || r >= size || c >= size);
 
 
-    if(gamestate == REVEAL)
+    if(gamestate == REVEAL) //vakje zichtbaar maken
     {
-        if (array[r][c] > 19)
+        if (array[r][c] > 19) //checken voor vlag
         {
             printf("hier staat al een vlag");
             return 0;
         }
-        else
+        else    //vakje zichtbaar maken
         {
-            reveal(array, size, r, c);
-            *move-=1;
-            if (*move == 0)
-            {
-                gamestate = WON;
-            }
-            return array[r][c];
+            reveal(array, size, r, c, move);
+            return array[r][c]; //Waarde van zichtbare vakje returnen
         }
     }
 
-    else if (gamestate == FLAG)
+    else//vlag plaatsen
     {
-        if (array[r][c] > 19)
+        if (array[r][c] > 19) //vlag weghalen wanneer er al een vlag staat
         {
             array[r][c] -= 10;
             return 0;
         }
-        else
+        else //vlag plaatsen
         {
             array[r][c] += 10;
             return 0;
         }
     }
-
-    else
-    {
-        printf("something went wrong");
-        return 0;
-    }
 }
 
 uint8_t checkswap(state *gamestate, uint8_t input, char modus[7])
 {
-    if (input == 15)
+    if (input == 15) // 15 = mode wisselen
     {
         if (*gamestate == FLAG)
         {
-            strcpy(modus, "onthul");;
+            strcpy(modus, "onthul");
             *gamestate = REVEAL;
         }
         else
@@ -173,45 +140,77 @@ uint8_t checkswap(state *gamestate, uint8_t input, char modus[7])
 
 void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
 {
-    printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus);
-        scanf("%hhu", r);
-        *s = checkswap(&gamestate, *r, modus);
-        if (*s)
-        {
-            return;
-        }
+    printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
+    scanf("%hhu", r); //checkt eerste getal
+    *s = checkswap(&gamestate, *r, modus);
+    if (*s)
+    {
+        return;
+    }
 
-        printf("vul colom in (15 om te vlag te toggelen)");
-        scanf("%hhu", c);
-        *s = checkswap(&gamestate, *c, modus);
-        if (*s)
-        {
-            return;
-        }
+    printf("vul colom in (15 om te vlag te toggelen)"); //enkel zichtbaar wanneer speler maar 1 getal ingeeft
+    scanf("%hhu", c); //checkt tweede getal
+    *s = checkswap(&gamestate, *c, modus);
+    if (*s)
+    {
+        return;
+    }
 }
 
-void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c)
+void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c, uint8_t* move)
 {
-    array[r][c] -= 10;
-    if (array[r][c] == 0)
+    array[r][c] -= 10; //vakje zichtbaar maken
+    *move -= 1;        //elke keer dat een vakje zichtbaar gemaakt wordt moet de speler een move minder doen (*move = aantal vakjes dat geen bom is)
+    if (array[r][c] == 0) //checkt of zichtbaar gemaakte vakje gelijk is aan 0
     {
-        for(int8_t i = -1; i<2; i++)
+        for(int8_t i = -1; i<2; i++) //alle vakjes die not niet zichtbaar zijn rond de 0 zichtbaar maken
         {
             for(int8_t j = -1; j<2; j++)
             {
-                if(r+i >= size || r+i < 0 || c+j >= size || c+j < 0)
+                if(r+i >= size || r+i < 0 || c+j >= size || c+j < 0) //vakjes buiten het veld overslaan
                 {
                     continue;
                 }
-                if (j == 0 && i == 0)
+                if (j == 0 && i == 0) //eigen vakje overslaan om infinte loop te voorkomen
                 {
                     continue;
                 }
-                if(array[r+i][c+j] <20 && array[r+i][c+j] > 9)
+                if(array[r+i][c+j] <20 && array[r+i][c+j] > 9) //checken of vakje nog niet zichtbaar is
                 {
-                    reveal(array, size, r+i, c+j); 
+                    reveal(array, size, r+i, c+j, move); //vakje zichtbaar maken en checken of het een 0 is
                 }
             }
         }
     }
+}
+
+void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* totmoves)
+{
+    uint8_t r,c, bommen;
+    do //input krijgen van user met controle
+    {
+        printf("kies een begin coordinaat (r c)");
+        scanf("%hhu %hhu", &r, &c);
+    } while (r < 0 || r >= size || c < 0 || c >= size );
+    do //veld blijven genereren tot geselecteerde vakje een 0 is
+    {
+        innit(array, size);
+        bommen = generate(array, size, dif);
+        *totmoves = (size*size)-bommen;
+    } while (array[r][c] != 10 );
+    reveal(array, size, r, c, totmoves);
+    
+}
+
+void innit(uint8_t array[15][15], uint8_t size)
+{
+    char correct;
+    for(uint8_t i = 0; i<size; i++) //elk vakje in de array een waarde geven
+    {
+        for(uint8_t j = 0; j< size; j++)
+        {
+            array[i][j] = 10;
+        }
+    }
+    gamestate = REVEAL; //spel starten
 }
