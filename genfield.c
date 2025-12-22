@@ -132,8 +132,8 @@ uint8_t checkbombs(uint8_t array[][15], uint8_t size, uint8_t RowIndex, uint8_t 
 }
 uint8_t generate(uint8_t array[15][15], uint8_t size, uint8_t selecdif)
 {
-    uint8_t amount, dif, row, column;
-    int8_t dificulty[] = {-1, 0, 1}; 
+    uint8_t amount, row, column;
+    int8_t dif, dificulty[] = {-1, 0, 1}; 
     uint8_t bomb[61];
     dif = dificulty[selecdif];
     amount = ((size*size)/4) + (dif*size/3); //hoeveelheid bommen gebaseerd op moeilijkheid en grootte van veld
