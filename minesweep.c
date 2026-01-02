@@ -47,12 +47,12 @@ int main(void)
             fflush(stdin);
             printf("BOEM: je bent verloren druk r om opnieuw te beginnen of s om te stoppen: ");
             scanf(" %c", &restart);
-            while (restart != 'r' && restart != 's')
+            while (restart != 'r' && restart !='R' && restart != 's' && restart !='S')
             {
                 printf("ongeldige input s = stop, r = restart: ");
                 scanf(" %c", &restart);
             }
-            if (restart == 'R')
+            if (restart == 'R' || restart == 'r')
             {
                 gamestate = CONFIG;
             }
