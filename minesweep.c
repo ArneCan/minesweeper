@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "genfield.c"
-#include "gamelogic.c"
+#include <time.h>
+#include "gamelogic.h"
+#include "genfield.h"
 
 int main(void)
 {
@@ -17,12 +18,11 @@ int main(void)
 
         srand(time(NULL));
 
-        do {
-            size = GetSize();
-            dif = GetDif();
-            innit(array, size);
-        } while (gamestate == CONFIG);                  //end game setup
+        gamestate = CONFIG;
+        size = GetSize();
+        dif = GetDif();
             
+        innit(array, size);
         showfield(array, size, &moves);                         //begin eerste move
         firstmove(array, size, dif, &moves);
                                                         // eind eerste move

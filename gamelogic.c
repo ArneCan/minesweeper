@@ -1,17 +1,11 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "gamelogic.h"
+#include "genfield.h"
+#include <string.h>
 
-enum states {CONFIG, REVEAL, FLAG, WON, LOST};
-typedef enum states state;
-state gamestate = CONFIG;
-
-void showfield(uint8_t array[15][15], uint8_t size, uint8_t* move); //speelveld laten zien met coordinaten
-uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7]); //verwerkt speler inputs
-void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7]); //input dialoog
-uint8_t checkswap(state *gamestate, uint8_t input, char modus[7]); //wisselen tussen vlag en onthul
-void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c, uint8_t* move); //vakje zichtbaar maken
-void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* totmoves); //eerste move is altijd 0
-void innit(uint8_t array[15][15], uint8_t size); //innitialisatie van het veld
+state gamestate;
 
 void showfield(uint8_t array[15][15], uint8_t size, uint8_t* move)
 {
@@ -140,8 +134,16 @@ uint8_t checkswap(state *gamestate, uint8_t input, char modus[7])
 
 void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
 {
+    uint8_t checkinput, ch;
     printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
-    scanf("%hhu", r); //checkt eerste getal
+    checkinput = scanf("%hhu", r); //checkt eerste getal
+    while (checkinput != 1)
+    {
+        printf("ongeldige input\n");
+        while ((ch = getchar()) != '\n' && ch != EOF) {} //input buffer leeg maken
+        printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
+        checkinput = scanf("%hhu", r);
+    }
     *s = checkswap(&gamestate, *r, modus);
     if (*s)
     {
@@ -149,7 +151,14 @@ void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
     }
 
     printf("vul colom in (15 om te vlag te toggelen)"); //enkel zichtbaar wanneer speler maar 1 getal ingeeft
-    scanf("%hhu", c); //checkt tweede getal
+    checkinput = scanf("%hhu", c); //checkt tweede getal
+    while (checkinput != 1)
+    {
+        printf("ongeldige input\n");
+        while ((ch = getchar()) != '\n' && ch != EOF) {}
+        printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
+        checkinput = scanf("%hhu", c);
+    }
     *s = checkswap(&gamestate, *c, modus);
     if (*s)
     {
@@ -186,11 +195,18 @@ void reveal(uint8_t array[15][15],uint8_t size,uint8_t r, uint8_t c, uint8_t* mo
 
 void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* totmoves)
 {
-    uint8_t r,c, bommen;
+    uint8_t r,c, bommen, checkinput, ch;
     do //input krijgen van user met controle
     {
         printf("kies een begin coordinaat (r c)");
-        scanf("%hhu %hhu", &r, &c);
+        checkinput = scanf("%hhu %hhu", &r, &c);
+        while (checkinput != 2)
+        {
+            printf("ongeldige input\n");
+            while ((ch = getchar()) != '\n' && ch != EOF) {}
+            printf("kies een begin coordinaat (r c)"); //vraagt rij en kolom en checkt voor wisselen
+            checkinput = scanf("%hhu %hhu", &r, &c);
+        }
     } while (r < 0 || r >= size || c < 0 || c >= size );
     do //veld blijven genereren tot geselecteerde vakje een 0 is
     {

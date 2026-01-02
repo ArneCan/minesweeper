@@ -4,11 +4,8 @@
 #include <stdint.h>
 #include <time.h>
 
-uint8_t GetSize(); //vraagt grootte aan user met verschillende opties
-uint8_t GetDif(); //zelfde nut als GetSize maar dan voor moeilijkheid
 void bombs(uint8_t*array, uint8_t amount, uint8_t dimention);//genereert de bommen in het veld en checkt dat er geen 2 bommen op hetzelfde vakje liggen
 uint8_t checkdouble(uint8_t* array, uint8_t amount); // returned index van de eerst gevonden dubbele bom
-uint8_t generate(uint8_t array[15][15], uint8_t size, uint8_t dif); //telt het aantal bommen rondom een vakje
 uint8_t checkbombs(uint8_t array[][15], uint8_t size, uint8_t RowIndex, uint8_t ColIndex); //genereert elk vakje op het veld en returned het aantal bommen op het veld
 
 uint8_t GetSize()
