@@ -76,11 +76,11 @@ void showfield(uint8_t array[15][15], uint8_t size, uint8_t* move)
 uint8_t playeraction(uint8_t array[15][15], uint8_t size, uint8_t* move, char modus[7])
 {
     uint8_t swapped, r, c;
+    system("cls");
+    showfield(array, size, move);
     do //check out of bounds en of vakje al vlag is of al gerevealed is
     {
-        showfield(array, size, move);
         getcords(&swapped, &r, &c, modus);
-        system("cls");
     } while (array[r][c] -10 < 0 || array[r][c] > 29 || r >= size || c >= size);
 
 
@@ -143,6 +143,7 @@ void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
         while ((ch = getchar()) != '\n' && ch != EOF) {} //input buffer leeg maken
         printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
         checkinput = scanf("%hhu", r);
+        printf("\n");
     }
     *s = checkswap(&gamestate, *r, modus);
     if (*s)
@@ -158,6 +159,7 @@ void getcords(uint8_t* s, uint8_t* r, uint8_t* c, char modus[7])
         while ((ch = getchar()) != '\n' && ch != EOF) {}
         printf("mode: %s\nvul rij en kolom in met spatie in (15 om te vlag te toggelen)", modus); //vraagt rij en kolom en checkt voor wisselen
         checkinput = scanf("%hhu", c);
+        printf("\n");
     }
     *s = checkswap(&gamestate, *c, modus);
     if (*s)
@@ -207,7 +209,7 @@ void firstmove(uint8_t array[15][15], uint8_t size, uint8_t dif, uint8_t* totmov
             printf("kies een begin coordinaat (r c)"); //vraagt rij en kolom en checkt voor wisselen
             checkinput = scanf("%hhu %hhu", &r, &c);
         }
-    } while (r < 0 || r >= size || c < 0 || c >= size );
+    } while (r < 0 || r >= size || c < 0 || c >= size ); //buffer leeg maken
     do //veld blijven genereren tot geselecteerde vakje een 0 is
     {
         innit(array, size);
